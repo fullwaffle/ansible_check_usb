@@ -1,0 +1,27 @@
+---
+- name: Вставьте USB-устройство
+  pause:
+    prompt: "Вставьте USB-устройство и нажмите Enter, когда вы готовы"
+
+- name: Проверить, что появилось новое USB-устройство
+  shell: "lsblk -p | grep -oE '^/dev/sd[b-z][0-9]*' | sort | tail -n1"
+  register: new_usb_device
+
+- name: Удалите USB-устройство
+  pause:
+    prompt: "Удалите USB-устройство и нажмите Enter, когда вы готовы"
+  when: new_usb_device.stdout is defined
+
+- name: Проверить, что USB-устройство удалено
+  shell: "lsblk -p | grep -oE '^/dev/sd[b-z][0-9]*' | sort | tail -n1"
+  register: removed_usb_device
+  failed_when: new_usb_device.stdout == removed_usb_device.stdout
+
+- name: Верните USB устройство
+  pause:
+    prompt: "Верните USB-устройство и нажмите Enter, когда вы готовы"
+
+- name: Проверить, что появилось прошлое USB-устройство
+  shell: "lsblk -p | grep -oE '^/dev/sd[b-z][0-9]*' | sort | tail -n1"
+  register: back_usb_device
+  failed_when: back_usb_device.stdout != new_usb_device.stdout

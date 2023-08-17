@@ -1,0 +1,6 @@
+---
+- name: USB
+  hosts: localhost
+
+  roles:
+    - usb_drive
